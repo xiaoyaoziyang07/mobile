@@ -19,7 +19,7 @@ import com.wlan.comm.timeUtil;
 
 public class OtherHandleThread {
 	
-	//最终输出文件的分隔符
+/*	//最终输出文件的分隔符
 	private final String splitString = ",";
 	//每个字段前后的符号
 	private final String columnString = "'";
@@ -102,7 +102,7 @@ public class OtherHandleThread {
 	     }
 	}
 	
-	/**
+	*//**
 	 * 单独的文件读取,按照拆分规则进行拆分
 	 * 处理步骤
 	 * 1.文件读取
@@ -111,7 +111,7 @@ public class OtherHandleThread {
 	 * 4.对另存后的文件进行压缩
 	 * @param filename
 	 * @param _14bittime
-	 */
+	 *//*
 	private void fileReader(String filename){
         File f = new File(filename);
         String line = "";
@@ -154,18 +154,18 @@ public class OtherHandleThread {
         }
 	}
 	
-	/**
+	*//**
 	 * 核心处理程序
 	 * @param line
 	 * @param _14bitfile
-	 */
+	 *//*
 	private void takestr(String line) {
 		try{
-			/**
+			*//**
 			 * sample
 			 * 1387954250.863987|$|117.140.249.237|$|37472|$|211.151.151.6
 			 * |$|80|$|http://www.umeng.com/app_logs|$|
-			 */
+			 *//*
 			
 			tmpArray = line.split("\\|\\$\\|");
 			
@@ -213,10 +213,10 @@ public class OtherHandleThread {
 	}
 	
 	
-	/**
+	*//**
 	 * 构建文件
 	 * @param fl
-	 */
+	 *//*
 	private void buildFile(){
 		try{
 			this.fileName = "AHTTPP"+this.msgno+"01D"+this._14bittime+"E"+this.supplyNo(this.fileNo)+".txt";
@@ -230,10 +230,10 @@ public class OtherHandleThread {
 		
 	}
 	
-	/**
+	*//**
 	 * 关闭文件句柄
 	 * 在文件轮换或读取完毕后
-	 */
+	 *//*
 	
 	private void closeFile(){
 		try{
@@ -273,6 +273,6 @@ public class OtherHandleThread {
 	public static void main(String[] args){
 		OtherHandleThread h = new OtherHandleThread(publicLoadConf.httpConfList.get(0).getSrcDirect(),publicLoadConf.httpConfList.get(0).getDstDirect(),publicLoadConf.httpConfList.get(0).getMsgno());
 		h.run();
-	}
+	}*/
 	
 }

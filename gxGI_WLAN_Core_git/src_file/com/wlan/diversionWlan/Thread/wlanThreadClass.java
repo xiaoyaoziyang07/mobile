@@ -76,7 +76,8 @@ public class wlanThreadClass extends Thread {
 						if(tims < publicLoadConf.fileDuration){
 							Thread.sleep(publicLoadConf.fileDuration - tims);
 						}
-					}else if(type == 4){
+					}
+					/*else if(type == 4){
 						//other
 						OtherHandleThread oht = new OtherHandleThread(this.srcPath, this.dstPath,this.msgno);
 						oht.run();
@@ -85,7 +86,7 @@ public class wlanThreadClass extends Thread {
 						if(tims < publicLoadConf.fileDuration){
 							Thread.sleep(publicLoadConf.fileDuration - tims);
 						}
-					}
+					}*/
 
 				}catch(Exception e){
 					e.printStackTrace();

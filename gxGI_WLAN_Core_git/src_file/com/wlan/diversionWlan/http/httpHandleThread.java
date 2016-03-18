@@ -10,8 +10,11 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
+import com.sun.jmx.remote.internal.ArrayQueue;
 import com.wlan.comm.gzipUtil;
 import com.wlan.comm.operationUtil;
 import com.wlan.comm.publicLoadConf;
@@ -92,9 +95,7 @@ public class httpHandleThread implements Runnable{
 	    		return;
 	    	}
 	    	
-	    	
-	    	
-	    	for(int j=0;j<contents.size()/;j++){
+	    	for(int j=0;j<contents.size();j++){
 	    		
 	    		flittle = new File(contents.get(j).getAbsolutePath());
 	    		
@@ -102,7 +103,7 @@ public class httpHandleThread implements Runnable{
 	        		  
 	    			try{
 		    			//文件为WLANLOG_[14bittime].dat
-		    			fileReader(contents.get(j).getAbsolutePath());
+		    			fileReader(contents.get(j));
 		    			
 		    			filefrom = new File(contents.get(j).getAbsolutePath());
 		    			//删除
@@ -137,6 +138,15 @@ public class httpHandleThread implements Runnable{
 		return files;
 	}
 
+	private LinkedList<String> getFileNames(){
+		HashSet<String> set = new HashSet<String>();
+		for(File file : contents){
+			set.add(splitTimeStr(file.getName()));
+		}
+		LinkedList<String> fileNames = new LinkedList<String>();
+		fileNames.addAll(set);
+		return fileNames;
+	}
 	/**
 	 * 单独的文件读取,按照拆分规则进行拆分
 	 * 处理步骤
@@ -147,12 +157,11 @@ public class httpHandleThread implements Runnable{
 	 * @param filename
 	 * @param _14bittime
 	 */
-	private void fileReader(String filename){
-        File f = new File(filename);
+	private void fileReader(File f){
         String line = "";
         if(!f.exists()){
         	
-          System.out.println("--- file don't exists!"+filename);
+          System.out.println("--- file don't exists!"+f.getName());
         
         }else{
             //文件存在,读取文件
@@ -170,7 +179,7 @@ public class httpHandleThread implements Runnable{
             	  }
               }
 
-              System.out.println("[totalJC]"+filename+" JC:"+i);
+              System.out.println("[totalJC]"+f.getName()+" JC:"+i);
               
             }catch(Exception e){
             	System.err.println("[Http.fileReader]"+e.toString());
@@ -231,7 +240,7 @@ public class httpHandleThread implements Runnable{
 			this.outs.write(tmpLine.toString());
 			this.outs.write("\r\n");
 			
-			if(publicLoadConf.httpConf.getType()==1) {
+			if(Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[0])==1) {
 				//按照字节数
 				this.currentStore = this.currentStore + tmpLine.toString().length();
 			}else{
@@ -240,7 +249,7 @@ public class httpHandleThread implements Runnable{
 			}
 			
 			//超过阈值，构建新的文件
-			if(this.currentStore > publicLoadConf.httpConf.getSize() && publicLoadConf.httpConf.getSize()>0){
+			if(this.currentStore > Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[1]) && Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[1])>0){
 				this.closeFile();
 				this.fileNo++;
 				this.buildFile();
@@ -259,7 +268,7 @@ public class httpHandleThread implements Runnable{
 	 */
 	private void buildFile(){
 		try{
-			this.fileName = "AHTTPP"+msgno+"01D"+splitTimeStr(contents.get(0).getName())+"E"+supplyNo(fileNo)+".txt";
+			this.fileName = "AHTTPP"+msgno+"01D"+getFileNames().getFirst()+"E"+supplyNo(fileNo)+".txt";
 	        fos = new FileOutputStream(dstpath+File.separator+fileName,true);
 		    outs = new OutputStreamWriter(fos, "UTF-8");
 		}catch(Exception e){
