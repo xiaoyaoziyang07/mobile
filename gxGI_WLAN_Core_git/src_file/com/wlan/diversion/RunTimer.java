@@ -5,6 +5,7 @@ import java.util.*;
 
 import com.wlan.comm.*;
 import com.wlan.diversionWlan.allBeging;
+import com.wlan.diversionWlan.Thread.wlanThreadClass;
 
 public class RunTimer {
   private final Timer timer = new Timer();
@@ -45,8 +46,15 @@ public class RunTimer {
   }
 
   public static void main(String[] args) {
-//    RunTimer eggTimer = new RunTimer(1);
-//    eggTimer.start();
+	  
+	  Timer timer = new Timer();
+	  timer.schedule(new TimerTask() {
+		
+		@Override
+		public void run() {
+			new TimerLoad();
+		}
+	}, 500);
   }
 
 }

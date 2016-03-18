@@ -419,7 +419,25 @@ public class timeUtil {
 		return String.valueOf(ix);
 
     }
-
+    
+    public static String format2JavaTime(String str){
+    	String[] strs = str.split("\\.");
+    	if(strs.length!=2){
+    		throw new IllegalArgumentException("错误的时间格式");
+    	}
+    	if(strs[1].length()!=6){
+    		throw new IllegalArgumentException("错误的时间格式");
+    	}
+    	Date date;
+		try {
+			date = new Date(Long.parseLong(strs[0]));
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("错误的时间格式");
+		}
+    	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	String front = format.format(date);
+    	return front + strs[1] + "000";
+    }
 	  
 	  
 	public static void main(String[] args) throws InterruptedException, ParseException {

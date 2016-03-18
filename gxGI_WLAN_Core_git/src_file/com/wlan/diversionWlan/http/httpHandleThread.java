@@ -7,12 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
+import java.util.Comparator;
 import java.util.List;
 
 import com.wlan.comm.gzipUtil;
@@ -20,12 +17,12 @@ import com.wlan.comm.operationUtil;
 import com.wlan.comm.publicLoadConf;
 import com.wlan.comm.timeUtil;
 
-public class httpHandleThread {
+public class httpHandleThread implements Runnable{
 	
 	//最终输出文件的分隔符
 	private final String splitString = "|";
 	//每个字段前后的符号
-	private final String columnString = "'";
+//	private final String columnString = "'";
 	
 	private String srcpath = "";
 	private String dstpath = "";
@@ -44,33 +41,50 @@ public class httpHandleThread {
     private StringBuffer tmpLine;
 	private String[] tmpArray;
     private String _14bittime = "";
+    
+    private List<File> contents;
+    private int deviceNum;
 	
 	
-	public httpHandleThread(String s,String d, String m){
-		srcpath = s;
-		dstpath = d;
-		msgno = m;
-		this._14bittime = operationUtil.DateTimeFunctionString();
-	}
+//	public httpHandleThread( String s, String d, String m){
+//		srcpath = s;
+//		dstpath = d;
+//		msgno = m;
+//		this._14bittime = operationUtil.DateTimeFunctionString();
+//	}
 	
 	public httpHandleThread(){
-		
+		srcpath = publicLoadConf.httpConf.getSrcDirect();
+		dstpath = publicLoadConf.httpConf.getDstDirect();
+		msgno = publicLoadConf.httpConf.getMsgno();
+		_14bittime = operationUtil.DateTimeFunctionString();
+		deviceNum = srcpath.split("\\|").length;
 	}
 	
+	@Override
 	public void run() {
 		
 		System.out.println("--HTTP,Handle");
 		
-        java.io.File file; 
+        File file; 
         File filefrom, flittle;
         long lcurrent = System.currentTimeMillis();
 		
         this.fileNo = 0;
         
         file = new File(srcpath);
+        System.out.println(file.getAbsolutePath());
 	    if(file.exists()){
-	    	List<File> contents = fileWalker(srcpath);
+	    	
+	    	contents = fileWalker(srcpath);
 //	    	java.util.Arrays.sort(contents);
+	    	Collections.sort(contents, new Comparator<File>() {
+
+				@Override
+				public int compare(File file1, File file2) {
+					return splitTimeStr(file1.getName()).compareTo(splitTimeStr(file1.getName()));
+				}
+			});
 	        
 	    	if(contents.size()>1) {
 	    		this.buildFile();
@@ -78,7 +92,9 @@ public class httpHandleThread {
 	    		return;
 	    	}
 	    	
-	    	for(int j=0;j<contents.size();j++){
+	    	
+	    	
+	    	for(int j=0;j<contents.size()/;j++){
 	    		
 	    		flittle = new File(contents.get(j).getAbsolutePath());
 	    		
@@ -103,15 +119,18 @@ public class httpHandleThread {
 	
 	private List<File> fileWalker(String srcpath) {
 		List<File> files = new ArrayList<File>();
-		File path = new File(srcpath);
-		if(path.exists()){
-			File[] contents = path.listFiles();
-			for(File f : contents){
-				if(f.isFile()){
-					files.add(f);
-				}
-				if(f.isDirectory()){
-					files.addAll(fileWalker(f.getAbsolutePath()));
+		String[] paths = srcpath.split("\\|");
+		for(String p : paths){
+			File path = new File(p);
+			if(path.exists()){
+				File[] contents = path.listFiles();
+				for(File f : contents){
+					if(f.isFile()){
+						files.add(f);
+					}
+					if(f.isDirectory()){
+						files.addAll(fileWalker(f.getAbsolutePath()));
+					}
 				}
 			}
 		}
@@ -189,9 +208,10 @@ public class httpHandleThread {
 			
 			tmpLine=new StringBuffer();
 			//起止时间,暂时一致
-			tmpLine.append(timeUtil.returnDate1970to14Supper(tmpArray[5]));
+			tmpLine.append(timeUtil.format2JavaTime(tmpArray[5]));
 			tmpLine.append(splitString);
-			tmpLine.append(timeUtil.returnDate1970to14Supper(tmpArray[6]));
+			tmpLine.append(timeUtil.format2JavaTime(tmpArray[6]));
+			tmpLine.append(splitString);
 			tmpLine.append(tmpArray[0]);
 			tmpLine.append(splitString);
 			tmpLine.append(tmpArray[1]);
@@ -239,8 +259,8 @@ public class httpHandleThread {
 	 */
 	private void buildFile(){
 		try{
-			this.fileName = "AHTTPP"+this.msgno+"01D"+this._14bittime+"E"+this.supplyNo(this.fileNo)+".txt";
-	        fos = new FileOutputStream(this.dstpath+this.fileName,true);
+			this.fileName = "AHTTPP"+msgno+"01D"+splitTimeStr(contents.get(0).getName())+"E"+supplyNo(fileNo)+".txt";
+	        fos = new FileOutputStream(dstpath+File.separator+fileName,true);
 		    outs = new OutputStreamWriter(fos, "UTF-8");
 		}catch(Exception e){
 			e.printStackTrace();
@@ -268,14 +288,13 @@ public class httpHandleThread {
 		try {
 			gzipUtil.zipFile(this.dstpath+this.fileName);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	//从文件名中拆出对应的14位时间
 	private String splitTimeStr(String oldstr) {
-		return oldstr.substring(8,22);
+		return oldstr.substring(14,28);
 	}
 	
 	private String supplyNo(int no){
@@ -289,8 +308,8 @@ public class httpHandleThread {
 	}
 	
 	public static void main(String[] args){
-		httpHandleThread h = new httpHandleThread(publicLoadConf.httpConfList.get(0).getSrcDirect(),publicLoadConf.httpConfList.get(0).getDstDirect(),publicLoadConf.httpConfList.get(0).getMsgno());
-		h.run();
+		httpHandleThread hht = new httpHandleThread();
+		String fileName = hht.splitTimeStr("WLANLOG_PRO07_20140928170500.dat");
+		System.out.println(fileName);
 	}
-	
 }

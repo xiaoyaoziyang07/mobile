@@ -43,7 +43,7 @@ public class wlanThreadClass extends Thread {
 					long tims = System.currentTimeMillis();
 					if(type == 1) {
 						//http
-						httpHandleThread hht = new httpHandleThread(this.srcPath, this.dstPath,this.msgno);
+						httpHandleThread hht = new httpHandleThread();
 						hht.run();
 						
 						tims = System.currentTimeMillis() - tims;

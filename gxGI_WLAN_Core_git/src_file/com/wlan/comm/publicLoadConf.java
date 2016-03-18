@@ -28,13 +28,13 @@ public class publicLoadConf {
   
   //配置http和nat的目录结构
   public static ArrayList<directObject> natConfList = new ArrayList<directObject>();
-  public static ArrayList<directObject> httpConfList = new ArrayList<directObject>();
+  public static directObject httpConf;
   public static ArrayList<directObject> otherConfList = new ArrayList<directObject>();
   //读取http和nat的日志
-  public static confObject httpConf = new confObject();
-  public static confObject otherConf = new confObject();
-  public static confObject natConf = new confObject();
-  public static confObject radiusConf = new confObject();
+//  public static confObject httpConf = new confObject();
+//  public static confObject otherConf;
+  public static confObject natConf;
+  public static confObject radiusConf;
   /**
    * Nat msgNo Nat 文件也有的MsgNo,递增用
    */
@@ -97,7 +97,7 @@ public class publicLoadConf {
 	        System.out.println("[sysUSER]"+sysUSER);
 	        System.out.println("[sysPWD]"+sysPWD);
 	        
-	        String tmpstr1,tmpstr2,tmpstr3;
+	        String tmpstr1,tmpstr2,tmpstr3,tmpstr4;
 	        String[] tmpArray1,tmpArray2,tmpArray3;
 	        directObject dmodel;
 
@@ -123,19 +123,27 @@ public class publicLoadConf {
 	        tmpstr1 = c.getValue("HTTPsrcCataLog");
 	        tmpstr2 = c.getValue("HTTPdstCataLog");
 	        tmpstr3 = c.getValue("HTTPMsgNo");
-	        tmpArray1 = tmpstr1.split("\\|");
-	        tmpArray2 = tmpstr2.split("\\|");
-	        tmpArray3 = tmpstr3.split("\\|");
-	        for(int i=0;i<tmpArray1.length;i++){
-	        	dmodel = new directObject();
-	        	dmodel.setSrcDirect(tmpArray1[i]);
-	        	dmodel.setDstDirect(tmpArray2[i]);
-	        	dmodel.setMsgno(tmpArray3[i]);
-	        	System.out.print((i+1)+".[HTTP.src]"+dmodel.getSrcDirect());
-	        	System.out.println(" --> [HTTP.dst]"+dmodel.getDstDirect()+" [Msg]"+dmodel.getMsgno());
-	        	httpConfList.add(dmodel);
+	        tmpstr4 = c.getValue("HttpConfigure");
+//	        tmpArray1 = tmpstr1.split("\\|");
+//	        tmpArray2 = tmpstr2.split("\\|");
+//	        tmpArray3 = tmpstr3.split("\\|");
+	        if(tmpstr1 != ""){
+	        	httpConf = new directObject();
 	        }
-	        System.out.println("{HTTP.ConfList.Size}"+httpConfList.size());
+	        httpConf.setSrcDirect(tmpstr1);
+	        httpConf.setDstDirect(tmpstr2);
+	        httpConf.setMsgno(tmpstr3);
+	        httpConf.setConfig(tmpstr4);
+//	        for(int i=0;i<tmpArray1.length;i++){
+//	        	dmodel = new directObject();
+//	        	dmodel.setSrcDirect(tmpArray1[i]);
+//	        	dmodel.setDstDirect(tmpArray2[i]);
+//	        	dmodel.setMsgno(tmpArray3[i]);
+//	        	System.out.print((i+1)+".[HTTP.src]"+dmodel.getSrcDirect());
+//	        	System.out.println(" --> [HTTP.dst]"+dmodel.getDstDirect()+" [Msg]"+dmodel.getMsgno());
+//	        	httpConfList.add(dmodel);
+//	        }
+//	        System.out.println("{HTTP.ConfList.Size}"+httpConfList.size());
 	        
 	      //Other 目录部分
 	        tmpstr1 = c.getValue("OthersrcCataLog");
@@ -156,44 +164,48 @@ public class publicLoadConf {
 	        System.out.println("{Other.ConfList.Size}"+otherConfList.size());
 	        
 	        //nat Configure
-	        tmpstr1 = c.getValue("NATConfigure");
-	        tmpArray1 = tmpstr1.split("\\|");
-	        natConf.setType(Integer.parseInt(tmpArray1[0]));
-	        natConf.setSize(Long.parseLong(tmpArray1[1]));
-	        System.out.println("{NAT.Configure}"+natConf.getType()+" "+natConf.getSize());
+//	        tmpstr1 = c.getValue("NATConfigure");
+//	        tmpArray1 = tmpstr1.split("\\|");
+//	        natConf.setType(Integer.parseInt(tmpArray1[0]));
+//	        natConf.setSize(Long.parseLong(tmpArray1[1]));
+//	        System.out.println("{NAT.Configure}"+natConf.getType()+" "+natConf.getSize());
 	        
 	        //http Configure
-	        tmpstr2 = c.getValue("HttpConfigure");
-	        tmpArray2 = tmpstr2.split("\\|");
-	        httpConf.setType(Integer.parseInt(tmpArray2[0]));
-	        httpConf.setSize(Long.parseLong(tmpArray2[1]));
-	        System.out.println("{HTTP.Configure}"+httpConf.getType()+" "+httpConf.getSize());
+//	        tmpstr2 = c.getValue("HttpConfigure");
+//	        tmpArray2 = tmpstr2.split("\\|");
+//	        httpConf.setType(Integer.parseInt(tmpArray2[0]));
+//	        httpConf.setSize(Long.parseLong(tmpArray2[1]));
+//	        System.out.println("{HTTP.Configure}"+httpConf.getType()+" "+httpConf.getSize());
 	        
 	        //radius Configure
-	        tmpstr2 = c.getValue("RADIUSConfigure");
-	        tmpArray2 = tmpstr2.split("\\|");
-	        radiusConf.setType(Integer.parseInt(tmpArray2[0]));
-	        radiusConf.setSize(Long.parseLong(tmpArray2[1]));
-	        System.out.println("{RADIUS.Configure}"+radiusConf.getType()+" "+radiusConf.getSize());
+//	        tmpstr2 = c.getValue("RADIUSConfigure");
+//	        if(tmpstr2 != null){
+//	        	radiusConf = new confObject();
+//	        	tmpArray2 = tmpstr2.split("\\|");
+//	        	radiusConf.setType(Integer.parseInt(tmpArray2[0]));
+//	        	radiusConf.setSize(Long.parseLong(tmpArray2[1]));
+//	        	System.out.println("{RADIUS.Configure}"+radiusConf.getType()+" "+radiusConf.getSize());
+//	        	
+//	        }
 	        
 	        fileDuration = Long.parseLong(c.getValue("fileDuration"));
 	        
 	        System.out.println("[fileDuration]"+fileDuration);
 	        
-	        natMsgNo = natMsgNoConfBean.readNo();
-	        System.out.println("[natMsgNo]" + natMsgNo);
-
-	        radiusMsgNo = radiusMsgNoConfBean.readNo();
-	        System.out.println("[radiusMsgNo]" + radiusMsgNo);
-	        
-	        lastRadiusTime = lastRadiusTimeStampBean.readTimes();
-	        System.out.println("[lastRadiusTime]" + lastRadiusTime+"-->"+timeUtil.returnDate1970to14(lastRadiusTime));
-
-	        RADIUSdstCataLog = c.getValue("RADIUSdstCataLog");
-	        System.out.println("[RADIUSdstCataLog]"+RADIUSdstCataLog);
-
-	        RADIUSProCode = c.getValue("RADIUSProCode");
-	        System.out.println("[RADIUSProCode]"+RADIUSProCode);
+//	        natMsgNo = natMsgNoConfBean.readNo();
+//	        System.out.println("[natMsgNo]" + natMsgNo);
+//
+//	        radiusMsgNo = radiusMsgNoConfBean.readNo();
+//	        System.out.println("[radiusMsgNo]" + radiusMsgNo);
+//	        
+//	        lastRadiusTime = lastRadiusTimeStampBean.readTimes();
+//	        System.out.println("[lastRadiusTime]" + lastRadiusTime+"-->"+timeUtil.returnDate1970to14(lastRadiusTime));
+//
+//	        RADIUSdstCataLog = c.getValue("RADIUSdstCataLog");
+//	        System.out.println("[RADIUSdstCataLog]"+RADIUSdstCataLog);
+//
+//	        RADIUSProCode = c.getValue("RADIUSProCode");
+//	        System.out.println("[RADIUSProCode]"+RADIUSProCode);
 	        
 	        System.out.println("[load system config end ]");
 	        

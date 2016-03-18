@@ -1,29 +1,44 @@
 package com.wlan.diversionWlan.Object;
 
 public class directObject {
-	
+
 	private String srcDirect = "";
 	private String dstDirect = "";
-	//NAT or HTTP的信息编号
+	// NAT or HTTP的信息编号
 	private String msgno = "";
+
+	private String config = "";
+
 	public String getSrcDirect() {
 		return srcDirect;
 	}
+
 	public void setSrcDirect(String srcDirect) {
 		this.srcDirect = srcDirect;
 	}
+
 	public String getDstDirect() {
 		return dstDirect;
 	}
+
 	public void setDstDirect(String dstDirect) {
 		this.dstDirect = dstDirect;
 	}
+
 	public String getMsgno() {
 		return msgno;
 	}
+
 	public void setMsgno(String msgno) {
 		this.msgno = msgno;
 	}
-	
-	
+
+	public String getConfig() {
+		return config;
+	}
+
+	public void setConfig(String config) {
+		this.config = config;
+	}
+
 }
