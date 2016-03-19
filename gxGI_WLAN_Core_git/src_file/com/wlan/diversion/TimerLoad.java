@@ -52,8 +52,9 @@ public class TimerLoad extends HttpServlet {
 //	  if(publicLoadConf.httpConfList!=null && publicLoadConf.httpConfList.size()>0) {
 	  if(publicLoadConf.httpConf != null){
 		  try {
+			  do1 = publicLoadConf.httpConf;
 //			  Thread[] t1 = new Thread[publicLoadConf.httpConfList.size()];
-			  Thread t1 = new Thread(new httpHandleThread());
+			  Thread t1 = new wlanThreadClass(do1.getSrcDirect(), do1.getDstDirect(), do1.getMsgno(), 1, "Http_Thread_0");
 			  t1.start();
 //			  for(int i=0;i<publicLoadConf.httpConfList.size();i++){
 //				  do1 = new directObject();
@@ -71,48 +72,48 @@ public class TimerLoad extends HttpServlet {
 		  }
 	  }
 	  
-	  /**
-	   * 多协议线程启动
-	   */
-	  if(publicLoadConf.otherConfList!=null && publicLoadConf.otherConfList.size()>0) {
-		  try {
-			  Thread[] t1 = new Thread[publicLoadConf.otherConfList.size()];
-			  for(int i=0;i<publicLoadConf.otherConfList.size();i++){
-				  do1 = new directObject();
-				  do1 = publicLoadConf.otherConfList.get(i);
-				  
-				  System.out.println("[Other.Thread"+i+"].start ");
-		    	  
-				  t1[i] = new wlanThreadClass(do1.getSrcDirect(),do1.getDstDirect(),do1.getMsgno(),4, "Other_Thread_0"+i);
-		    	  t1[i].start();
-		    	  
-		    	  System.out.println("[Other.Thread"+i+"].start over ");
-			  }
-		  }catch(Exception e){
-			  e.printStackTrace();
-		  }
-	  }
-	  /**
-	   * RADIUS 日志线程启动
-	   */
-	  if(publicLoadConf.radiusConf!=null) {
-		  try {
-			  	 System.out.println("[Radius.Thread].start ");
-		    	  
-			  	 Thread tRadius = new Thread();
-			  	 tRadius = new wlanThreadClass("", publicLoadConf.RADIUSdstCataLog, publicLoadConf.RADIUSProCode, 3, "Radius_Thread");
-			  	 tRadius.start();
-			  	 
-			  	 System.out.println("[Radius.Thread].start.over");
-		    	
-		  }catch(Exception e){
-			  e.printStackTrace();
-		  }
-	  }
-	  
-	  //首次启动后500ms运行查询
-	  RunTimer alarm = new RunTimer(500);
-	  alarm.start();
+//	  /**
+//	   * 多协议线程启动
+//	   */
+//	  if(publicLoadConf.otherConfList!=null && publicLoadConf.otherConfList.size()>0) {
+//		  try {
+//			  Thread[] t1 = new Thread[publicLoadConf.otherConfList.size()];
+//			  for(int i=0;i<publicLoadConf.otherConfList.size();i++){
+//				  do1 = new directObject();
+//				  do1 = publicLoadConf.otherConfList.get(i);
+//				  
+//				  System.out.println("[Other.Thread"+i+"].start ");
+//		    	  
+//				  t1[i] = new wlanThreadClass(do1.getSrcDirect(),do1.getDstDirect(),do1.getMsgno(),4, "Other_Thread_0"+i);
+//		    	  t1[i].start();
+//		    	  
+//		    	  System.out.println("[Other.Thread"+i+"].start over ");
+//			  }
+//		  }catch(Exception e){
+//			  e.printStackTrace();
+//		  }
+//	  }
+//	  /**
+//	   * RADIUS 日志线程启动
+//	   */
+//	  if(publicLoadConf.radiusConf!=null) {
+//		  try {
+//			  	 System.out.println("[Radius.Thread].start ");
+//		    	  
+//			  	 Thread tRadius = new Thread();
+//			  	 tRadius = new wlanThreadClass("", publicLoadConf.RADIUSdstCataLog, publicLoadConf.RADIUSProCode, 3, "Radius_Thread");
+//			  	 tRadius.start();
+//			  	 
+//			  	 System.out.println("[Radius.Thread].start.over");
+//		    	
+//		  }catch(Exception e){
+//			  e.printStackTrace();
+//		  }
+//	  }
+//	  
+//	  //首次启动后500ms运行查询
+//	  RunTimer alarm = new RunTimer(500);
+//	  alarm.start();
 	  
   }
 }

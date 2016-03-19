@@ -1,12 +1,13 @@
 package cn.amichina.liyang;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -63,6 +64,46 @@ public class UtilsTest {
 	public void test06() throws Exception{
 		List<String> list = new ArrayList<String>();
 		Collections.sort(list);
-		
+	}
+	
+	@Test
+	public void test07() throws Exception{
+		System.out.println(timeUtil.format2JavaTime("1411897019.969793"));
+	}
+	
+	@Test
+	public void test08() {
+		File file = new File("D:/迅雷下载/blue.rar");
+		System.out.println(file.length()/1024.0/1024/1024);
+		System.out.println(file.getFreeSpace()/1024.0/1024/1024);
+		System.out.println(file.getTotalSpace()/1024.0/1024/1024);
+	}
+	
+	@Test
+	public void test09() throws IOException, InterruptedException {
+		File file = new File("D:/1.txt");
+		file.createNewFile();
+		file.setReadOnly();
+		Thread.sleep(10000);
+		file.delete();
+	}
+	
+	@Test
+	public void test10() {
+		List<String> list = new ArrayList<String>();
+		list.add("2014091509");
+		list.add("2014091502");
+		list.add("2014091504");
+		list.add("2014091503");
+		Collections.sort(list, new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				return Long.parseLong(o1)>Long.parseLong(o1)?-1:1;
+			}
+		});
+		for (String string : list) {
+			System.out.println(string);
+		}
 	}
 }
