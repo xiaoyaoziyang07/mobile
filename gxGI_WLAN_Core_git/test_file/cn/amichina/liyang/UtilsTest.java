@@ -90,20 +90,36 @@ public class UtilsTest {
 	
 	@Test
 	public void test10() {
-		List<String> list = new ArrayList<String>();
-		list.add("2014091509");
-		list.add("2014091502");
-		list.add("2014091504");
-		list.add("2014091503");
-		Collections.sort(list, new Comparator<String>() {
+		List<File> list = new ArrayList<File>();
+		list.add(new File("C:/201409"));
+		list.add(new File("C:/201403"));
+		list.add(new File("D:/201402"));
+		list.add(new File("201403"));
+		list.add(new File("201405"));
+		list.add(new File("201404"));
+		for (File file : list) {
+			System.out.println(file);
+		}
+		System.out.println("排序后：-----------------------");
+		Collections.sort(list, new Comparator<File>() {
 
 			@Override
-			public int compare(String o1, String o2) {
-				return Long.parseLong(o1)>Long.parseLong(o1)?-1:1;
+			public int compare(File o1, File o2) {
+				return (o1.getName()).compareTo(o2.getName());
+//				return Long.parseLong(o1)>Long.parseLong(o1)?-1:1;
 			}
 		});
-		for (String string : list) {
-			System.out.println(string);
+		for (File file : list) {
+			System.out.println(file);
+		}
+	}
+	
+	@Test
+	public void test11() {
+		File file = new File("D:/out/");
+		String[] files = file.list();
+		for(String f : files){
+			System.out.println(f);
 		}
 	}
 }

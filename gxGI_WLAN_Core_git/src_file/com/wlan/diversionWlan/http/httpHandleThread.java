@@ -28,6 +28,8 @@ public class httpHandleThread implements Runnable {
 	private String srcpath = "";
 	private String dstpath = "";
 	private String msgno = "";
+	private int type;
+	private long size;
 
 	private FileOutputStream fos = null;
 	private OutputStreamWriter outs = null;
@@ -55,132 +57,120 @@ public class httpHandleThread implements Runnable {
 		srcpath = publicLoadConf.httpConf.getSrcDirect();
 		dstpath = publicLoadConf.httpConf.getDstDirect();
 		msgno = publicLoadConf.httpConf.getMsgno();
+		type = Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[0]);
+		size = Long.parseLong(publicLoadConf.httpConf.getConfig().split("\\|")[1]);
 	}
 
 	@Override
 	public void run() {
-
+		
+		long time1 = System.currentTimeMillis();
+		System.out.println("任务开始时间" + time1);
 		System.out.println("--HTTP,Handle");
-
-		File file;
-		File flittle;
 
 		fileNo = 0;
 
-		file = new File(srcpath);
-		System.out.println(file.getAbsolutePath());
-
 		contents = fileWalker(srcpath);
-		// java.util.Arrays.sort(contents);
 		Collections.sort(contents, new Comparator<File>() {
 
 			@Override
 			public int compare(File file1, File file2) {
-				long fileName1 = Long.parseLong(splitTimeStr(file1.getName()));
-				long fileName2 = Long.parseLong(splitTimeStr(file1.getName()));
-				if(fileName1 > fileName2){
-					return -1;
-				}
-				else{
-					return 1;
-				}
+				return splitTimeStr(file1.getName()).compareTo(splitTimeStr(file2.getName()));
 			}
 		});
-		
-		for(File f : contents){
-			System.out.println(f.getName());
-		}
-		// if(contents.size()>1) {
-		// buildFile();
-		// }else{
-		// return;
-		// }
+		if (contents.size() != 0) {
+			try {
+				String beforeTime = "";
+				for (int j = 0; j < contents.size(); j++) {
+					
+					File flittle = contents.get(j);
+					InputStreamReader read = new InputStreamReader(new FileInputStream(flittle), "GBK");
+					BufferedReader reader = new BufferedReader(read);
+					if(splitTimeStr(flittle.getName())!=beforeTime){
+						fileNo = 0;
+						beforeTime = splitTimeStr(flittle.getName());
+					}
+					
+					fileName = "AHTTPP" + msgno + "01D" + beforeTime + "E" + supplyNo(fileNo) + ".txt";
+					File dstFile = new File(dstpath, fileName);
+					List<File> dstFiles = fileWalker(dstpath);
+					
+					if(!dstFiles.contains(dstFile)){
+						fos = new FileOutputStream(dstFile);
+						outs = new OutputStreamWriter(fos, "UTF-8");
+					}
+					
+					String line;
+					while ((line = reader.readLine()) != null) {
 
-		try {
-			for (int j = 0; j < contents.size(); j++) {
-
-				flittle = contents.get(j);
-
-				InputStreamReader read = new InputStreamReader(
-						new FileInputStream(flittle), "GBK");
-				BufferedReader reader = new BufferedReader(read);
-				String line;
-				flittle.setReadOnly();
-				while ((line = reader.readLine()) != null) {
-					/**
-					 * sample
-					 * 1387954250.863987|$|117.140.249.237|$|37472|$|211.151
-					 * .151.6 |$|80|$|http://www.umeng.com/app_logs|$|
-					 */
-
-					tmpArray = line.split("\\|");
-					tmpLine = new StringBuffer();
-					tmpLine.append(timeUtil.format2JavaTime(tmpArray[5]));
-					tmpLine.append(splitString);
-					tmpLine.append(timeUtil.format2JavaTime(tmpArray[6]));
-					tmpLine.append(splitString);
-					tmpLine.append(tmpArray[0]);
-					tmpLine.append(splitString);
-					tmpLine.append(tmpArray[1]);
-					tmpLine.append(splitString);
-					tmpLine.append(tmpArray[2]);
-					tmpLine.append(splitString);
-					tmpLine.append(tmpArray[3]);
-					tmpLine.append(splitString);
-					tmpLine.append(tmpArray[7]);
-					tmpLine.append(splitString);
-					tmpLine.append(tmpArray[4]);
-					tmpLine.append(splitString);
-					for (int i = 0; i < 8; i++) {
+						tmpArray = line.split("\\|");
+						tmpLine = new StringBuffer();
+						tmpLine.append(timeUtil.format2JavaTime(tmpArray[5]));
 						tmpLine.append(splitString);
+						tmpLine.append(timeUtil.format2JavaTime(tmpArray[6]));
+						tmpLine.append(splitString);
+						tmpLine.append(tmpArray[0]);
+						tmpLine.append(splitString);
+						tmpLine.append(tmpArray[1]);
+						tmpLine.append(splitString);
+						tmpLine.append(tmpArray[2]);
+						tmpLine.append(splitString);
+						tmpLine.append(tmpArray[3]);
+						tmpLine.append(splitString);
+						tmpLine.append(tmpArray[7]);
+						tmpLine.append(splitString);
+						tmpLine.append(tmpArray[4]);
+						tmpLine.append(splitString);
+						for (int i = 0; i < 8; i++) {
+							tmpLine.append(splitString);
+						}
+						outs.write(tmpLine.toString());
+						outs.write("\r\n");
+						outs.flush();
+						
+//						if (Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[0]) == 1) {
+//							// 按照字节数
+//							currentStore = currentStore + tmpLine.toString().length();
+//						} else {
+//							// 按照记录数
+//							currentStore = currentStore + 1;
+//						}
+						if(dstFile.length()>size){
+							fos.close();
+							outs.close();
+							fileNo++;
+							fileName = "AHTTPP" + msgno + "01D" + splitTimeStr(flittle.getName()) + "E" + supplyNo(fileNo) + ".txt";
+							dstFile = new File(dstpath, fileName);
+							fos = new FileOutputStream(dstFile);
+							outs = new OutputStreamWriter(fos, "UTF-8");
+//							currentStore = 0;
+						}
+						// 超过阈值，构建新的文件
+//						if (currentStore > Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[1])&& Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[1]) > 0) {
+//							System.out.println(currentStore);
+////							closeFile();
+//							fileNo++;
+//							// buildFile();
+//							currentStore = 0;
+//						}
 					}
-					fileName = "AHTTPP" + msgno + "01D"
-							+ splitTimeStr(flittle.getName()) + "E"
-							+ supplyNo(fileNo) + ".txt";
-					fos = new FileOutputStream(dstpath + File.separator
-							+ fileName, true);
-					outs = new OutputStreamWriter(fos, "UTF-8");
-					outs.write(tmpLine.toString());
-					outs.write("\r\n");
-
-					outs.flush();
-					if (Integer.parseInt(publicLoadConf.httpConf.getConfig()
-							.split("\\|")[0]) == 1) {
-						// 按照字节数
-						currentStore = currentStore
-								+ tmpLine.toString().length();
-					} else {
-						// 按照记录数
-						currentStore = currentStore + 1;
-					}
-
-					// 超过阈值，构建新的文件
-					if (currentStore > Integer.parseInt(publicLoadConf.httpConf
-							.getConfig().split("\\|")[1])
-							&& Integer.parseInt(publicLoadConf.httpConf
-									.getConfig().split("\\|")[1]) > 0) {
-						System.out.println(currentStore);
-						closeFile();
-						fileNo++;
-						// buildFile();
-						currentStore = 0;
-					}
-
+					reader.close();
+					// 删除
+					flittle.delete();
 				}
-				// 文件为WLANLOG_[14bittime].dat
-				// fileReader(contents.get(j));
-				reader.close();
-				// 删除
-				flittle.delete();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}finally{
+				closeFile();
 			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
-		closeFile();
+		long time2 = System.currentTimeMillis();
+		System.out.println("任务结束时间：" + time2);
+		System.out.println("任务用时：" + (time2-time1)/1000.0/60 + "s");
 	}
 
 	private List<File> fileWalker(String srcpath) {
@@ -190,9 +180,9 @@ public class httpHandleThread implements Runnable {
 			File path = new File(p);
 			if (path.exists()) {
 				File[] contents = path.listFiles();
-				if (contents.length == 0) {
-					path.delete();
-				}
+//				if (contents.length == 0) {
+//					path.delete();
+//				}
 				for (File f : contents) {
 					if (f.isFile()) {
 						files.add(f);
