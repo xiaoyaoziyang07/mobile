@@ -1,11 +1,10 @@
 package com.wlan.diversion;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.SQLException;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import com.wlan.comm.*;
-import com.wlan.diversionWlan.allBeging;
-import com.wlan.diversionWlan.Thread.wlanThreadClass;
+import com.wlan.comm.publicLoadConf;
 
 public class RunTimer {
   private final Timer timer = new Timer();
@@ -55,6 +54,13 @@ public class RunTimer {
 			new TimerLoad();
 		}
 	}, 500);
+//	  ExecutorService service = Executors.newCachedThreadPool();
+//	  service.execute(new Runnable() {
+//		
+//		@Override
+//		public void run() {
+//			
+//		}
+//	});
   }
-
 }

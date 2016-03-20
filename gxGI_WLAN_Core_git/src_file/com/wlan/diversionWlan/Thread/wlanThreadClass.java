@@ -25,11 +25,11 @@ public class wlanThreadClass extends Thread {
 	private String msgno;
 	
 	public wlanThreadClass(String s, String d, String m, int t, String n){
-		this.srcPath = s;
-		this.dstPath = d;
-		this.msgno = m;
-		this.type = t;
-		this.threadName = n;
+		srcPath = s;
+		dstPath = d;
+		msgno = m;
+		type = t;
+		threadName = n;
 	}
 	
 	//定时对所监视的目录进行读取
@@ -54,7 +54,7 @@ public class wlanThreadClass extends Thread {
 						
 					}else if(type == 2){
 						//nat
-						natHandleThread nht = new natHandleThread(this.srcPath, this.dstPath, this.msgno);
+						natHandleThread nht = new natHandleThread(srcPath, dstPath, msgno);
 						nht.run();
 
 						tims = System.currentTimeMillis() - tims;
@@ -68,7 +68,7 @@ public class wlanThreadClass extends Thread {
 						if(currentTimes > (publicLoadConf.lastRadiusTime + publicLoadConf.radiusConf.getType()*60000)) {
 							//计算当前的15分钟时间
 							currentTimes = currentTimes - (currentTimes  % (publicLoadConf.radiusConf.getType()*60000));
-							radiusHandleThread rhd = new radiusHandleThread(this.dstPath, this.msgno,currentTimes);
+							radiusHandleThread rhd = new radiusHandleThread(dstPath, msgno,currentTimes);
 							rhd.run();
 						}
 
@@ -77,16 +77,16 @@ public class wlanThreadClass extends Thread {
 							Thread.sleep(publicLoadConf.fileDuration - tims);
 						}
 					}
-					/*else if(type == 4){
+					else if(type == 4){
 						//other
-						OtherHandleThread oht = new OtherHandleThread(this.srcPath, this.dstPath,this.msgno);
+						OtherHandleThread oht = new OtherHandleThread();
 						oht.run();
 						
 						tims = System.currentTimeMillis() - tims;
 						if(tims < publicLoadConf.fileDuration){
 							Thread.sleep(publicLoadConf.fileDuration - tims);
 						}
-					}*/
+					}
 
 				}catch(Exception e){
 					e.printStackTrace();

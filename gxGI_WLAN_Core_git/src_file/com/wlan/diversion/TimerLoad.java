@@ -49,50 +49,30 @@ public class TimerLoad extends HttpServlet {
 	  /**
 	   * Http 日志线程启动
 	   */
-//	  if(publicLoadConf.httpConfList!=null && publicLoadConf.httpConfList.size()>0) {
-	  if(publicLoadConf.httpConf != null){
+	 /* if(publicLoadConf.httpConf != null){
 		  try {
 			  do1 = publicLoadConf.httpConf;
-//			  Thread[] t1 = new Thread[publicLoadConf.httpConfList.size()];
 			  Thread t1 = new wlanThreadClass(do1.getSrcDirect(), do1.getDstDirect(), do1.getMsgno(), 1, "Http_Thread_0");
 			  t1.start();
-//			  for(int i=0;i<publicLoadConf.httpConfList.size();i++){
-//				  do1 = new directObject();
-//				  do1 = publicLoadConf.httpConfList.get(i);
-//				  
-//				  System.out.println("[Http.Thread"+i+"].start ");
-//		    	  
-//				  t1[i] = new wlanThreadClass(do1.getSrcDirect(),do1.getDstDirect(),do1.getMsgno(),1, "Http_Thread_0"+i);
-//		    	  t1[i].start();
-//		    	  
-//		    	  System.out.println("[Http.Thread"+i+"].start over ");
-//			  }
+			  System.out.println("[Http_Thread finish");
+		  }catch(Exception e){
+			  e.printStackTrace();
+		  }
+	  }*/
+	  
+	  /**
+	   * 多协议线程启动
+	   */
+	  if(publicLoadConf.otherConf != null){
+		  try {
+			  do1 = publicLoadConf.otherConf;
+			  Thread t1 = new wlanThreadClass(do1.getSrcDirect(), do1.getDstDirect(), do1.getMsgno(), 4, "Other_Thread");
+			  t1.start();
+			  System.out.println("Other_Thread finish");
 		  }catch(Exception e){
 			  e.printStackTrace();
 		  }
 	  }
-	  
-//	  /**
-//	   * 多协议线程启动
-//	   */
-//	  if(publicLoadConf.otherConfList!=null && publicLoadConf.otherConfList.size()>0) {
-//		  try {
-//			  Thread[] t1 = new Thread[publicLoadConf.otherConfList.size()];
-//			  for(int i=0;i<publicLoadConf.otherConfList.size();i++){
-//				  do1 = new directObject();
-//				  do1 = publicLoadConf.otherConfList.get(i);
-//				  
-//				  System.out.println("[Other.Thread"+i+"].start ");
-//		    	  
-//				  t1[i] = new wlanThreadClass(do1.getSrcDirect(),do1.getDstDirect(),do1.getMsgno(),4, "Other_Thread_0"+i);
-//		    	  t1[i].start();
-//		    	  
-//		    	  System.out.println("[Other.Thread"+i+"].start over ");
-//			  }
-//		  }catch(Exception e){
-//			  e.printStackTrace();
-//		  }
-//	  }
 //	  /**
 //	   * RADIUS 日志线程启动
 //	   */

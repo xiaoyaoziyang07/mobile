@@ -1,9 +1,6 @@
 package com.wlan.comm;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.io.*;
-import java.rmi.Naming;
 
 import com.wlan.diversionWlan.Object.confObject;
 import com.wlan.diversionWlan.Object.directObject;
@@ -29,7 +26,7 @@ public class publicLoadConf {
   //配置http和nat的目录结构
   public static ArrayList<directObject> natConfList = new ArrayList<directObject>();
   public static directObject httpConf;
-  public static ArrayList<directObject> otherConfList = new ArrayList<directObject>();
+  public static directObject otherConf;
   //读取http和nat的日志
 //  public static confObject httpConf = new confObject();
 //  public static confObject otherConf;
@@ -124,44 +121,26 @@ public class publicLoadConf {
 	        tmpstr2 = c.getValue("HTTPdstCataLog");
 	        tmpstr3 = c.getValue("HTTPMsgNo");
 	        tmpstr4 = c.getValue("HttpConfigure");
-//	        tmpArray1 = tmpstr1.split("\\|");
-//	        tmpArray2 = tmpstr2.split("\\|");
-//	        tmpArray3 = tmpstr3.split("\\|");
 	        if(tmpstr1 != ""){
 	        	httpConf = new directObject();
+	        	httpConf.setSrcDirect(tmpstr1);
+	        	httpConf.setDstDirect(tmpstr2);
+	        	httpConf.setMsgno(tmpstr3);
+	        	httpConf.setConfig(tmpstr4);
 	        }
-	        httpConf.setSrcDirect(tmpstr1);
-	        httpConf.setDstDirect(tmpstr2);
-	        httpConf.setMsgno(tmpstr3);
-	        httpConf.setConfig(tmpstr4);
-//	        for(int i=0;i<tmpArray1.length;i++){
-//	        	dmodel = new directObject();
-//	        	dmodel.setSrcDirect(tmpArray1[i]);
-//	        	dmodel.setDstDirect(tmpArray2[i]);
-//	        	dmodel.setMsgno(tmpArray3[i]);
-//	        	System.out.print((i+1)+".[HTTP.src]"+dmodel.getSrcDirect());
-//	        	System.out.println(" --> [HTTP.dst]"+dmodel.getDstDirect()+" [Msg]"+dmodel.getMsgno());
-//	        	httpConfList.add(dmodel);
-//	        }
-//	        System.out.println("{HTTP.ConfList.Size}"+httpConfList.size());
 	        
 	      //Other 目录部分
 	        tmpstr1 = c.getValue("OthersrcCataLog");
 	        tmpstr2 = c.getValue("OtherdstCataLog");
 	        tmpstr3 = c.getValue("OtherMsgNo");
-	        tmpArray1 = tmpstr1.split("\\|");
-	        tmpArray2 = tmpstr2.split("\\|");
-	        tmpArray3 = tmpstr3.split("\\|");
-	        for(int i=0;i<tmpArray1.length;i++){
-	        	dmodel = new directObject();
-	        	dmodel.setSrcDirect(tmpArray1[i]);
-	        	dmodel.setDstDirect(tmpArray2[i]);
-	        	dmodel.setMsgno(tmpArray3[i]);
-	        	System.out.print((i+1)+".[Other.src]"+dmodel.getSrcDirect());
-	        	System.out.println(" --> [Other.dst]"+dmodel.getDstDirect()+" [Msg]"+dmodel.getMsgno());
-	        	otherConfList.add(dmodel);
+	        tmpstr4 = c.getValue("OtherConfigure");
+	        if(tmpstr1 != ""){
+	        	otherConf = new directObject();
+	        	otherConf.setSrcDirect(tmpstr1);
+	        	otherConf.setDstDirect(tmpstr2);
+	        	otherConf.setMsgno(tmpstr3);
+	        	otherConf.setConfig(tmpstr4);
 	        }
-	        System.out.println("{Other.ConfList.Size}"+otherConfList.size());
 	        
 	        //nat Configure
 //	        tmpstr1 = c.getValue("NATConfigure");
@@ -216,17 +195,10 @@ public class publicLoadConf {
 	    }
 
   }
-  
-  
   public publicLoadConf() {
   }
 
   public static int getTimerJg() {
     return timerJg;
   }
-
-  public static void main(String[] args){
-	  publicLoadConf pl = new publicLoadConf();
-  }
-  
 }

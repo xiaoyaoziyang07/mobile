@@ -28,13 +28,13 @@ public class httpHandleThread implements Runnable {
 	private String srcpath = "";
 	private String dstpath = "";
 	private String msgno = "";
-	private int type;
+//	private int type;
 	private long size;
 
 	private FileOutputStream fos = null;
 	private OutputStreamWriter outs = null;
 	// 记录当前文件的大小或行号
-	private long currentStore = 0;
+//	private long currentStore = 0;
 	// 当前文件的行号
 	private int fileNo = 0;
 
@@ -57,7 +57,7 @@ public class httpHandleThread implements Runnable {
 		srcpath = publicLoadConf.httpConf.getSrcDirect();
 		dstpath = publicLoadConf.httpConf.getDstDirect();
 		msgno = publicLoadConf.httpConf.getMsgno();
-		type = Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[0]);
+//		type = Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[0]);
 		size = Long.parseLong(publicLoadConf.httpConf.getConfig().split("\\|")[1]);
 	}
 
@@ -84,7 +84,7 @@ public class httpHandleThread implements Runnable {
 				for (int j = 0; j < contents.size(); j++) {
 					
 					File flittle = contents.get(j);
-					InputStreamReader read = new InputStreamReader(new FileInputStream(flittle), "GBK");
+					InputStreamReader read = new InputStreamReader(new FileInputStream(flittle), "UTF-8");
 					BufferedReader reader = new BufferedReader(read);
 					if(splitTimeStr(flittle.getName())!=beforeTime){
 						fileNo = 0;
