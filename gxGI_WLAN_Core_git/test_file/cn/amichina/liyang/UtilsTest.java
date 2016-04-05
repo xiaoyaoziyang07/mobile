@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Test;
@@ -125,6 +127,70 @@ public class UtilsTest {
 	
 	@Test
 	public void test12() {
+		Map<String, String> map = new HashMap<String, String>();
+		System.out.println(map.get("er"));
 	}
 
+	@Test
+	public void test13() {
+		String line = "99,223.71.185.115,43597,205.251.193.18,53,1458143990";
+		
+		String[] tmpArray = line.split(",");
+		
+		StringBuffer tmpLine = new StringBuffer();
+		String splitString = "|";
+		tmpLine.append(timeUtil.format2OtherTime(tmpArray[5]));
+		tmpLine.append(splitString);
+		tmpLine.append(timeUtil.format2OtherTime(tmpArray[5]));
+		tmpLine.append(splitString);
+		tmpLine.append(tmpArray[1]);
+		tmpLine.append(splitString);
+		tmpLine.append(tmpArray[2]);
+		tmpLine.append(splitString);
+		tmpLine.append(tmpArray[3]);
+		tmpLine.append(splitString);
+		tmpLine.append(tmpArray[4]);
+		tmpLine.append(splitString);
+//		tmpLine.append(tmpArray[7]);
+		tmpLine.append(splitString);
+		String protocal;
+		if(tmpArray[3].equals("443")){
+			protocal = "HTTPS";
+		}else if(tmpArray[3].equals("21")){
+			protocal = "FTP";
+		}else if(tmpArray[3].equals("25")){
+			protocal = "SMTP";
+		}else if(tmpArray[3].equals("143")){
+			protocal = "IMAP";
+		}else if(tmpArray[3].equals("110")){
+			protocal = "POP3";
+		}else if(tmpArray[3].equals("53")){
+			protocal = "DNS";
+		}else if(tmpArray[3].equals("161")||tmpArray[3].equals("162")){
+			protocal = "SNMP";
+		}else{
+			protocal = "OTHER";
+		}
+		tmpLine.append(protocal);
+		tmpLine.append(splitString);
+		for (int i = 0; i < 8; i++) {
+			tmpLine.append(splitString);
+		}
+		System.out.println(tmpLine);
+	}
+	@Test
+	public void test14() {
+		File file1 = new File("D:/1.txt");
+		File file2 = new File("D:/1.txt");
+		System.out.println(file1.equals(file2));
+	}
+	
+	@Test
+	public void test15() {
+		File file1 = new File("D:/data");
+		File[] files = file1.listFiles();
+		for(File f : files){
+			System.out.println(f.lastModified());
+		}
+	}
 }

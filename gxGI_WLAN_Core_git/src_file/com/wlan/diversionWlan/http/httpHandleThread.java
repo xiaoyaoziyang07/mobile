@@ -34,7 +34,7 @@ public class httpHandleThread implements Runnable {
 	private FileOutputStream fos = null;
 	private OutputStreamWriter outs = null;
 	// 记录当前文件的大小或行号
-//	private long currentStore = 0;
+	private long currentStore = 0;
 	// 当前文件的行号
 	private int fileNo = 0;
 
@@ -46,18 +46,13 @@ public class httpHandleThread implements Runnable {
 
 	private List<File> contents;
 
-	// public httpHandleThread( String s, String d, String m){
-	// srcpath = s;
-	// dstpath = d;
-	// msgno = m;
-	// _14bittime = operationUtil.DateTimeFunctionString();
-	// }
-
 	public httpHandleThread() {
+		/*
+		 * 构造函数初始化配置参数
+		 */
 		srcpath = publicLoadConf.httpConf.getSrcDirect();
 		dstpath = publicLoadConf.httpConf.getDstDirect();
 		msgno = publicLoadConf.httpConf.getMsgno();
-//		type = Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[0]);
 		size = Long.parseLong(publicLoadConf.httpConf.getConfig().split("\\|")[1]);
 	}
 
@@ -69,8 +64,12 @@ public class httpHandleThread implements Runnable {
 		System.out.println("--HTTP,Handle");
 
 		fileNo = 0;
-
+		long t1 = System.currentTimeMillis();
+		//源目录下所有文件
 		contents = fileWalker(srcpath);
+		long t2 = System.currentTimeMillis();
+		System.out.println(t2-t1);
+		//文件按照时间排序
 		Collections.sort(contents, new Comparator<File>() {
 
 			@Override
@@ -78,85 +77,99 @@ public class httpHandleThread implements Runnable {
 				return splitTimeStr(file1.getName()).compareTo(splitTimeStr(file2.getName()));
 			}
 		});
-		if (contents.size() != 0) {
+		System.out.println("The File Count:"+contents.size()+" In Path:"+dstpath);
+		System.out.println("srcPath:"+srcpath);
+		if (contents.size() > 0) {
 			try {
-				String beforeTime = "";
+				File currentFile = contents.get(0);
+				String currentTime = splitTimeStr(currentFile.getName());
+				File nextFile = null;
+				String nextTime = null;
+				
 				for (int j = 0; j < contents.size(); j++) {
 					
-					File flittle = contents.get(j);
-					InputStreamReader read = new InputStreamReader(new FileInputStream(flittle), "UTF-8");
-					BufferedReader reader = new BufferedReader(read);
-					if(splitTimeStr(flittle.getName())!=beforeTime){
-						fileNo = 0;
-						beforeTime = splitTimeStr(flittle.getName());
-					}
-					
-					fileName = "AHTTPP" + msgno + "01D" + beforeTime + "E" + supplyNo(fileNo) + ".txt";
-					File dstFile = new File(dstpath, fileName);
-					List<File> dstFiles = fileWalker(dstpath);
-					
-					if(!dstFiles.contains(dstFile)){
-						fos = new FileOutputStream(dstFile);
-						outs = new OutputStreamWriter(fos, "UTF-8");
-					}
-					
-					String line;
-					while ((line = reader.readLine()) != null) {
-
-						tmpArray = line.split("\\|");
-						tmpLine = new StringBuffer();
-						tmpLine.append(timeUtil.format2JavaTime(tmpArray[5]));
-						tmpLine.append(splitString);
-						tmpLine.append(timeUtil.format2JavaTime(tmpArray[6]));
-						tmpLine.append(splitString);
-						tmpLine.append(tmpArray[0]);
-						tmpLine.append(splitString);
-						tmpLine.append(tmpArray[1]);
-						tmpLine.append(splitString);
-						tmpLine.append(tmpArray[2]);
-						tmpLine.append(splitString);
-						tmpLine.append(tmpArray[3]);
-						tmpLine.append(splitString);
-						tmpLine.append(tmpArray[7]);
-						tmpLine.append(splitString);
-						tmpLine.append(tmpArray[4]);
-						tmpLine.append(splitString);
-						for (int i = 0; i < 8; i++) {
-							tmpLine.append(splitString);
-						}
-						outs.write(tmpLine.toString());
-						outs.write("\r\n");
-						outs.flush();
+					System.out.println("Process File:"+currentFile.getAbsolutePath()+File.pathSeparator+currentFile.getName());
+					if(time1-currentFile.lastModified()>publicLoadConf.fileDuration){
+						System.out.println("Read File..");
+						//创建输入流读取源文件
+						InputStreamReader read = new InputStreamReader(new FileInputStream(currentFile), "UTF-8");
+						BufferedReader reader = new BufferedReader(read);
 						
-//						if (Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[0]) == 1) {
-//							// 按照字节数
-//							currentStore = currentStore + tmpLine.toString().length();
-//						} else {
-//							// 按照记录数
-//							currentStore = currentStore + 1;
-//						}
-						if(dstFile.length()>size){
-							fos.close();
-							outs.close();
-							fileNo++;
-							fileName = "AHTTPP" + msgno + "01D" + splitTimeStr(flittle.getName()) + "E" + supplyNo(fileNo) + ".txt";
-							dstFile = new File(dstpath, fileName);
+						//根据要求创建文件对象
+						fileName = "AHTTPP" + msgno + "01D" + currentTime + "E" + supplyNo(fileNo) + ".txt";
+						File dstFile = new File(dstpath, fileName);
+						//遍历目标路径，如果不包含该文件，就创建文件并初始化输出流
+						List<File> dstFiles = fileWalker(dstpath);
+						if(!dstFiles.contains(dstFile)){
 							fos = new FileOutputStream(dstFile);
 							outs = new OutputStreamWriter(fos, "UTF-8");
-//							currentStore = 0;
 						}
-						// 超过阈值，构建新的文件
-//						if (currentStore > Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[1])&& Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[1]) > 0) {
-//							System.out.println(currentStore);
-////							closeFile();
-//							fileNo++;
-//							// buildFile();
-//							currentStore = 0;
-//						}
+
+						String line;
+						while ((line = reader.readLine()) != null) {
+							//拼接字符串
+							tmpArray = line.split("\\|");
+							tmpLine = new StringBuffer();
+							tmpLine.append(timeUtil.format2JavaTime(tmpArray[5]));
+							tmpLine.append(splitString);
+							tmpLine.append(timeUtil.format2JavaTime(tmpArray[6]));
+							tmpLine.append(splitString);
+							tmpLine.append(tmpArray[0]);
+							tmpLine.append(splitString);
+							tmpLine.append(tmpArray[1]);
+							tmpLine.append(splitString);
+							tmpLine.append(tmpArray[2]);
+							tmpLine.append(splitString);
+							tmpLine.append(tmpArray[3]);
+							tmpLine.append(splitString);
+							tmpLine.append(tmpArray[7]);
+							tmpLine.append(splitString);
+							tmpLine.append(tmpArray[4]);
+							tmpLine.append(splitString);
+							for (int i = 0; i < 8; i++) {
+								tmpLine.append(splitString);
+							}
+							outs.write(tmpLine.toString());
+							outs.write("\r\n");
+							currentStore = currentStore + tmpLine.toString().getBytes("GBK").length + 2;
+//							outs.flush();
+							System.out.println("Write File ");
+							//判断是否超过配置的大小
+							if(currentStore>size){
+								System.out.println("dstFile Size Out "+size+" Create new File");
+								closeWriter();
+								fileNo++;
+								fileName = "AHTTPP" + msgno + "01D" + splitTimeStr(currentFile.getName()) + "E" + supplyNo(fileNo) + ".txt";
+								dstFile = new File(dstpath, fileName);
+								fos = new FileOutputStream(dstFile);
+								outs = new OutputStreamWriter(fos, "UTF-8");
+							}
+						}
+						
+						System.out.println("reader close");
+						reader.close();
+						// 删除原文件
+						currentFile.delete();
+						
+						if(j!=contents.size()-1){
+							nextFile = contents.get(j+1);
+							nextTime = splitTimeStr(nextFile.getName());
+							if(!currentTime.equals(nextTime)){
+								closeWriter();
+								fileNo = 0;
+								zipFile(dstpath + "*.txt");
+							}
+							currentFile = nextFile;
+							currentTime = nextTime;
+						}
+						
+						if(j == contents.size()-1){
+							closeWriter();
+							zipFile(dstpath + "*.txt");
+						}
+						
+						
 					}
-					reader.close();
-					// 删除
-					flittle.delete();
 				}
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
@@ -165,14 +178,30 @@ public class httpHandleThread implements Runnable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}finally{
-				closeFile();
+				try {
+					if(fos!=null){
+						fos.close();
+					}
+					if(outs!=null){
+						outs.flush();
+						outs.close();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		long time2 = System.currentTimeMillis();
 		System.out.println("任务结束时间：" + time2);
-		System.out.println("任务用时：" + (time2-time1)/1000.0/60 + "s");
+		System.out.println("任务用时：" + (time2-time1)/1000.0 + "s");
 	}
 
+	
+	/**
+	 * 遍历目录，得到目录下的所有文件
+	 * @param srcpath 目录
+	 * @return 文件的集合
+	 */
 	private List<File> fileWalker(String srcpath) {
 		List<File> files = new ArrayList<File>();
 		String[] paths = srcpath.split("\\|");
@@ -196,167 +225,23 @@ public class httpHandleThread implements Runnable {
 		return files;
 	}
 
-	// private LinkedList<String> getFileNames(){
-	// HashSet<String> set = new HashSet<String>();
-	// for(File file : contents){
-	// set.add(splitTimeStr(file.getName()));
-	// }
-	// LinkedList<String> fileNames = new LinkedList<String>();
-	// fileNames.addAll(set);
-	// return fileNames;
-	// }
-	/**
-	 * 单独的文件读取,按照拆分规则进行拆分 处理步骤 1.文件读取 2.文件名称构建 3.按照大小或进行拆分 4.对另存后的文件进行压缩
-	 * 
-	 * @param filename
-	 * @param _14bittime
-	 */
-	// private void fileReader(File f){
-	// String line = "";
-	// if(!f.exists()){
-	//
-	// System.out.println("--- file don't exists!"+f.getName());
-	//
-	// }else{
-	// //文件存在,读取文件
-	// InputStreamReader read = null;
-	// BufferedReader reader = null;
-	// try {
-	// read = new InputStreamReader(new FileInputStream(f), "GBK");
-	// reader = new BufferedReader(read);
-	// int i=0;
-	// // StringBuffer sb = new StringBuffer();
-	// while ((line = reader.readLine()) != null) {
-	// i++;
-	// if(i>fileNo){
-	// takestr(line,f);
-	// }
-	// }
-	//
-	// System.out.println("[totalJC]"+f.getName()+" JC:"+i);
-	//
-	// }catch(Exception e){
-	// System.err.println("[Http.fileReader]"+e.toString());
-	// }finally{
-	// if(reader!=null){
-	// try {
-	// reader.close();
-	// } catch (IOException e) {
-	// }
-	// }
-	// if(read!=null){
-	// try {
-	// read.close();
-	// } catch (IOException e) {
-	// }
-	// }
-	// }
-	// }
-	// }
-
-	/**
-	 * 核心处理程序
-	 * 
-	 * @param line
-	 * @param _14bitfile
-	 */
-	// private void takestr(String line, File f) {
-	// try{
-	// /**
-	// * sample
-	// * 1387954250.863987|$|117.140.249.237|$|37472|$|211.151.151.6
-	// * |$|80|$|http://www.umeng.com/app_logs|$|
-	// */
-	//
-	// tmpArray = line.split("\\|");
-	// tmpLine=new StringBuffer();
-	// //起止时间,暂时一致
-	// tmpLine.append(timeUtil.format2JavaTime(tmpArray[5]));
-	// tmpLine.append(splitString);
-	// tmpLine.append(timeUtil.format2JavaTime(tmpArray[6]));
-	// tmpLine.append(splitString);
-	// tmpLine.append(tmpArray[0]);
-	// tmpLine.append(splitString);
-	// tmpLine.append(tmpArray[1]);
-	// tmpLine.append(splitString);
-	// tmpLine.append(tmpArray[2]);
-	// tmpLine.append(splitString);
-	// tmpLine.append(tmpArray[3]);
-	// tmpLine.append(splitString);
-	// tmpLine.append(tmpArray[7]);
-	// tmpLine.append(splitString);
-	// tmpLine.append(tmpArray[4]);
-	// tmpLine.append(splitString);
-	// for(int i=0;i<8;i++){
-	// tmpLine.append(splitString);
-	// }
-	// fileName =
-	// "AHTTPP"+msgno+"01D"+splitTimeStr(f.getName())+"E"+supplyNo(fileNo)+".txt";
-	// fos = new FileOutputStream(dstpath+File.separator+fileName,true);
-	// outs = new OutputStreamWriter(fos, "UTF-8");
-	// outs.write(tmpLine.toString());
-	// outs.write("\r\n");
-	//
-	// if(Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[0])==1)
-	// {
-	// //按照字节数
-	// currentStore = currentStore + tmpLine.toString().length();
-	// }else{
-	// //按照记录数
-	// currentStore = currentStore+1;
-	// }
-	//
-	// //超过阈值，构建新的文件
-	// if(currentStore >
-	// Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[1]) &&
-	// Integer.parseInt(publicLoadConf.httpConf.getConfig().split("\\|")[1])>0){
-	// System.out.println(currentStore);
-	// closeFile();
-	// fileNo++;
-	// // buildFile();
-	// currentStore = 0;
-	// }
-	//
-	// }catch(Exception e){
-	// e.printStackTrace();
-	// }
-	// }
-
-	/**
-	 * 构建文件
-	 * 
-	 * @param fl
-	 */
-	// private void buildFile(){
-	// try{
-	// fileName =
-	// "AHTTPP"+msgno+"01D"+getFileNames().getFirst()+"E"+supplyNo(fileNo)+".txt";
-	// fos = new FileOutputStream(dstpath+File.separator+fileName,true);
-	// outs = new OutputStreamWriter(fos, "UTF-8");
-	// }catch(Exception e){
-	// e.printStackTrace();
-	// }
-	//
-	// }
-
 	/**
 	 * 关闭文件句柄 在文件轮换或读取完毕后
 	 */
 
-	private void closeFile() {
-		try {
-			outs.close();
-			fos.close();
-			zipFile();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
+	private void closeWriter() {
+			try {
+				fos.close();
+				outs.flush();
+				outs.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 	}
 
-	private void zipFile() {
+	private void zipFile(String cmd) {
 		try {
-			gzipUtil.zipFile(dstpath + fileName);
+			gzipUtil.zipFile(cmd);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -375,11 +260,5 @@ public class httpHandleThread implements Runnable {
 		}
 
 		return ret;
-	}
-
-	public static void main(String[] args) {
-		httpHandleThread hht = new httpHandleThread();
-		String fileName = hht.splitTimeStr("WLANLOG_PRO07_20140928170500.dat");
-		System.out.println(fileName);
 	}
 }

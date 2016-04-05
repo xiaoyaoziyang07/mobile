@@ -438,7 +438,14 @@ public class timeUtil {
     	String front = format.format(date);
     	return front + strs[1] + "000";
     }
-	  
+    
+    public static String format2OtherTime(String str){
+		Date date = new Date(Long.parseLong(str)*1000);
+    	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	String front = format.format(date);
+    	return front + "000000000";
+    }
+    
 	  
 	public static void main(String[] args) throws InterruptedException, ParseException {
 //		System.out.println(timeUtil.retNextSecondsDate("20121213091739",28800));
